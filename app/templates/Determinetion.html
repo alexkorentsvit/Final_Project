@@ -1,0 +1,26 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="splash">
+  <div class="container">
+<h1>Determinetion of the composition</h1>
+<br></br>
+<br></br>
+<form action="" method="post" name="spectr">
+    {{form.hidden_tag()}}
+    <p>
+        Enter your Spectrum:<br>
+        {{form.spectr(size=80)}}
+        {% for error in form.errors.spectr %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}<br>
+    </p>
+    <p><input class="btn btn-default" type="submit" value="Determine the composition"></p>
+</form>
+<br></br>
+<form> 
+   <p><button class="btn btn-default" formaction="Info1"> Back to information </button></p>
+</form> 
+</div></div>
+{% endblock %}

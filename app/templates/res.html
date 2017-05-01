@@ -1,0 +1,47 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="splash">
+  <div class="container">
+{% if outputs is string %}
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+<h1> {{outputs}} </h1>
+<br></br>
+<form> 
+   <p><button class="btn btn-default" formaction="Determinetion"> Back to the Determinetion of the composition </button></p>
+</form> 
+{% else %}
+{% for output in outputs %}
+ <p style="text-align: 50px;">{{ output.el.name }} Proportion: <b>{{ output.body }}</b> </p>
+{% endfor %}
+<br></br>
+<br></br>
+
+<form action="" method="post" name="name_of_spectrum">
+        {{form2.hidden_tag()}}
+    <p>
+        Give name to the substance:<br>
+        {{form2.name_of_spectrum(size=80)}}
+        {% for error in form2.errors.name_of_spectrum %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+        {% if flag == true%}
+        <span style="color: red;">[This name already exists]</span>
+        {%endif%}</br>
+                                  
+    </p>
+    
+    <p><input class="btn btn-default" type="submit" value="Confirm the name"></p>
+</form>
+<br></br>
+<form> 
+   <p><button class="btn btn-default" formaction="Determinetion"> Back to the Determinetion of the composition </button></p>
+</form> 
+
+{% endif %}
+</div></div>
+{% endblock %}

@@ -1,0 +1,37 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="splash">
+  <div class="container">
+{% for output in outputs%}
+<p style="text-align: 50px;">{{ output.el.name }} has the spectrum: <b>{{ spectra }}</b> </p>
+{% endfor %}
+<br></br>
+
+<div class="article-content">
+<h1>Alredy at database</h1>
+<table class="table table-bordered">
+ <tr><th>Name</th><th>Spectrum</th>
+
+{% for d in data%}
+<tr style="background-color: #f5f5f5;">
+<td>{{d.name}}</td>
+<td>{{d.spectrum}}</td>
+</tr>
+{%endfor%}  
+
+
+</table>
+</div>
+
+
+
+<form> 
+   <p><button class="btn btn-default" formaction="Determinetion"> Back to the Determinetion of the composition </button></p>
+</form> 
+  </div>
+</div>
+
+{% endblock %}
