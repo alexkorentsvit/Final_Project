@@ -19,6 +19,29 @@
     color: lime;
     }
 </style>
+<nav class="navbar navbar-inverse">
+        <div class="container">
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+            {% if title == 'Information' %}
+              <li class="active"><a href="Info1">Information</a></li>
+            {% else %}
+              <li><a href="Info1">Information</a></li>
+            {% endif %}
+            {% if title == 'Determine the composition' %}
+              <li class="active"><a href="Determinetion">Determination</a></li>
+            {% else %}
+              <li><a href="Determinetion">Determination</a></li>
+            {% endif %}
+            {% if title == 'Database' %}
+              <li class="active"><a href="DataBase">Database</a></li>
+            {% else %}
+              <li><a href="DataBase">Database</a></li>
+            {% endif %}
+          </div><!--/.nav-collapse -->
+        </div>
+</nav>
+
 
   </head>
   <body>

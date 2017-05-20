@@ -15,6 +15,9 @@
         {% for error in form.errors.spectr %}
         <span style="color: red;">[{{error}}]</span>
         {% endfor %}<br>
+        {% if flag == true %}
+        <span style="color: red;">[Incorrect input]</span>
+        {% endif %}
     </p>
     <p><input class="btn btn-default" type="submit" value="Determine the composition"></p>
 </form>
