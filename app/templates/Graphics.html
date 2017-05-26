@@ -5,7 +5,7 @@
 <div class="splash">
   <div class="container">
 
-<form action="{{ url_for('DataBase') }}" method="post">
+<form action="{{ url_for('Graphics') }}" method="post">
 <table class="table table-bordered">
  <tr><th></th><th>№</th><th>Name</th><th>Spectrum</th>
 
@@ -21,16 +21,15 @@
 
 
 </table>
-<button  type="submit" class="btn btn-default">Delete the spectrum</button>
+<button  type="submit" class="btn btn-default">Show graphic</button>
 </form>
 {% if flag == true %}
-<span style="color: red;">[Chose the spectrum]</span>
+
+<img src={{filename}} alt="альтернативный текст"> 
+
+
 {%endif%}
 
-<form action="add">
-<button type="submit" class="btn btn-default">Add the spectrum</button>
-</form>  
-  
   
   
   

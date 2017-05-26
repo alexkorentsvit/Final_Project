@@ -40,4 +40,4 @@ def calc_matrix(spectrum_vhid,data):
     N = round(matrix[2][3], 3)
     H = round(matrix[1][3] - matrix[1][2]*N, 3)
     O = round(matrix[0][3] - matrix[0][1]*H - matrix[0][2]*N, 3)
-    return [{'el':{'name':him_el[0][0]},'body':O}, {'el':{'name':him_el[1][0]},'body':H}, {'el':{'name':him_el[2][0]},'body':N}]
+    return [{'el':{'name':him_el[0][0], 'spectrum': him_el[0][1]},'body':O}, {'el':{'name':him_el[1][0], 'spectrum': him_el[1][1]},'body':H}, {'el':{'name':him_el[2][0], 'spectrum': him_el[2][1]},'body':N}]

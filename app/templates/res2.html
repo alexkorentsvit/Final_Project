@@ -9,6 +9,13 @@
 <p style="text-align: 50px;">{{ output.el.name }} has the spectrum: <b>{{ spectra }}</b> </p>
 {% endfor %}
 <br></br>
+{% for element in elements_dict %}
+ <p style="text-align: 50px;">{{ element.el.name }} Proportion: <b>{{element.body }}</b> </p>
+{% endfor %}
+<br></br>
+
+<img src={{filename}} alt="альтернативный текст"> 
+<br></br><br></br>
 
 <div class="article-content">
 <h1>Alredy at database</h1>
