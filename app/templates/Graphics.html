@@ -5,17 +5,15 @@
 <div class="splash">
   <div class="container">
 
-<form action="{{ url_for('Graphics') }}" method="post">
+<form action="{{ url_for('Graphics') }}" method="post" name="graphic">
 <table class="table table-bordered">
- <tr><th></th><th>№</th><th>Name</th><th>Spectrum</th>
+ <tr><td align="center"></th><td align="center">№</th><td align="center">Name</th>
 
 {% for d in data%}
 <tr style="background-color: #f5f5f5;">
-<td><input name="id" type="radio" value="{{ d.id }}"/></td>
-<td>{{d.id}} </td>
-
-<td>{{d.name}}</td>
-<td>{{d.spectrum}}</td>
+<td align="center"><input name="id" type="radio" value="{{ d.id }}"/></td>
+<td align="center">{{d.id}} </td>
+<td align="center">{{d.name}}</td>
 </tr>
 {%endfor%}  
 
@@ -24,11 +22,13 @@
 <button  type="submit" class="btn btn-default">Show graphic</button>
 </form>
 {% if flag == true %}
-
-<img src={{filename}} alt="альтернативный текст"> 
-
-
+<span style="color: red;">[choose the substance]</span>
 {%endif%}
+
+
+
+
+
 
   
   

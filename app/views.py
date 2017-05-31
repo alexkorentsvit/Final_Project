@@ -2,7 +2,7 @@ import pylab as plt
 from flask import render_template, flash, redirect, session, request, url_for, send_file
 from app import app
 from app import db
-from forms import MyForm, MyForm2, MyForm3
+from forms import MyForm, MyForm2, MyForm3, MyForm4
 from logic import calc_matrix
 from models import Spec
 
@@ -20,19 +20,20 @@ def info1():
         user = user)
     
 
-@app.route('/Determinetion', methods = ['GET', 'POST'])
+@app.route('/Determination', methods = ['GET', 'POST'])
 def Determinetion():
     data = Spec.query.all()
     form = MyForm()
+    form2 = MyForm4()
     flag = False
+    
     if form.validate_on_submit():
-        
         prov = form.spectr.data.split(',')
         for i in range(len(prov)):
             try:
                 float(prov[i])
             except ValueError:
-                return render_template('Determinetion.html', 
+                return render_template('Determination.html', 
                                title = 'Determine the composition',
                                form = form,
                                flag = True)
@@ -42,7 +43,12 @@ def Determinetion():
                 session['output'] = [{'el':{'name':data[i].name},'body':1.0}]
                 flag = True
                 break
-        if calc_matrix(form.spectr.data,data)[0]['body'] + calc_matrix(form.spectr.data,data)[1]['body'] + calc_matrix(form.spectr.data,data)[2]['body'] <= 1.01 and  calc_matrix(form.spectr.data,data)[0]['body'] + calc_matrix(form.spectr.data,data)[1]['body'] + calc_matrix(form.spectr.data,data)[2]['body'] >= 0.98 and flag == False:
+            
+            
+        summa = 0
+        for i in range(5):
+            summa += calc_matrix(form.spectr.data,data)[i]['body']
+        if summa <= 1.01 and  summa >= 0.98 and flag == False:
             session['output'] = calc_matrix(form.spectr.data,data)
         elif flag == False:
             session['output'] = "Can't identify the spectrum"
@@ -50,10 +56,22 @@ def Determinetion():
         if len(session['output']) == 1:
             return redirect('/res2')
         return redirect('/res')
+    
+    elif request.method == "POST":
+        for i in range(len(data)):
+            if form2.substance.data == data[i].name:
+                session['spectra'] = data[i].spectrum
+                session['output'] = [{'el':{'name':data[i].name},'body':1.0}]
+                return redirect('/res2')
+        
+    
+    
     else:
-        return render_template('Determinetion.html', 
+        return render_template('Determination.html', 
                                title = 'Determine the composition',
-                               form = form)
+                               form = form,
+                               form2 = form2,
+                               data = data)
 
 
 
@@ -69,10 +87,10 @@ def res():
     spectra = session.get('spectra', None)
     data = Spec.query.all()
     
-    if len(outputs) == 3:
+    if len(outputs) == 5:
         i = 0
         n = 0
-        while n < 3:
+        while n < 5:
             if outputs[i]['body'] == 0.0:
                 del outputs[i]
                 n += 1
@@ -80,41 +98,42 @@ def res():
                 i += 1
                 n += 1
                 
-    simple = [1,2,3]            
-    Vhid = spectra.split(',')
-    for i in range(len(Vhid)):
-        Vhid[i] = float(Vhid[i])
+        simple = []            
+        Vhid = spectra.split(',')
+        for i in range(len(Vhid)):
+            simple.append(i+1)
+            Vhid[i] = float(Vhid[i])
+        
+        
+            
+        plt.figure('New')
+        plt.clf()
+        plt.title('New')
+        plt.xlabel('wavelength')
+        plt.ylabel('intensity')
+        
+        for i in range(len(outputs)):
+            plt.plot([1,2,3,4,5], outputs[i]['el']['spectrum'], label = outputs[i]['el']['name'])
+        
+        plt.plot(simple, Vhid, label = 'New')
+        plt.legend()
+        plt.savefig(filename)
+        
     
     
         
-    plt.figure('New')
-    plt.clf()
-    plt.title('New')
-    plt.xlabel('wavelength')
-    plt.ylabel('intensity')
-    
-    for i in range(len(outputs)):
-        plt.plot(simple, outputs[i]['el']['spectrum'], label = outputs[i]['el']['name'])
-    
-    plt.plot(simple, Vhid, label = 'New')
-    plt.legend()
-    plt.savefig(filename)
-    
-
-
-    
-    if form2.validate_on_submit():
-        for i in range(len(data)):
-            if form2.name_of_spectrum.data == data[i].name:
-                flag = True
-        
-        if flag == False:
+        if form2.validate_on_submit():
             for i in range(len(data)):
-                if spectra == data[i].spectrum:                    
-                    db.session.delete(data[i])
-                    db.session.commit()
-            session['name'] = form2.name_of_spectrum.data
-            return redirect('/substance')       
+                if form2.name_of_spectrum.data == data[i].name:
+                    flag = True
+            
+            if flag == False:
+                for i in range(len(data)):
+                    if spectra == data[i].spectrum:                    
+                        db.session.delete(data[i])
+                        db.session.commit()
+                session['name'] = form2.name_of_spectrum.data
+                return redirect('/substance')       
     return render_template('res.html', 
                            title = 'result',
                            form2 = form2,
@@ -157,60 +176,83 @@ def substance():
     
 @app.route('/res2', methods = ['GET', 'POST'])
 def res2():
+    buf = []
     data = Spec.query.all()
     outputs = session.get('output', None)
     spectra = session.get('spectra', None)
-    
-    for i in range(len(data)):
-        if data[i].spectrum == spectra:
-            label = data[i].name
-            buf = data[i].composition.split(' ')
-    
-    elements_dict = []
-    data_el = []
-    for i in range(len(buf)):
-        data_el.append(buf[i].split(':'))
-        for j in range(len(data)):
-            if data[j].name == data_el[i][0]:
-                elements_dict.append({'el':{'name':data_el[i][0],'spectrum': data[j].spectrum.split(',')}, 'body': data_el[i][1]})
-        
-        
-    for i in range(len(elements_dict)):
-        for j in range(len(elements_dict[i]['el']['spectrum'])):
-            elements_dict[i]['el']['spectrum'][j] = float(elements_dict[i]['el']['spectrum'][j]) 
-    
-    simple = [1,2,3]            
+    simple = []            
     Vhid = spectra.split(',')
     for i in range(len(Vhid)):
+        simple.append(i+1)
         Vhid[i] = float(Vhid[i])
-       
-    plt.figure(label)
-    plt.clf()
-    plt.title(label)
-    plt.xlabel('wavelength')
-    plt.ylabel('intensity')
-    
-    for i in range(len(elements_dict)):
-        plt.plot(simple, elements_dict[i]['el']['spectrum'], label = elements_dict[i]['el']['name'])
-    
-    plt.plot(simple, Vhid, label = label)
-    plt.legend()
-    plt.savefig(filename)
-    
-    
-    return render_template('res2.html', 
-                               title = 'result',
-                               outputs = outputs,
-                               spectra = spectra,
-                               data = data,
-                               filename = filename,
-                               elements_dict = elements_dict
-                               )
+        
+    for i in range(len(data)):
+        if data[i].spectrum == spectra and data[i].composition != None:
+            label = data[i].name
+            buf = data[i].composition.split(' ')
+    if len(buf) != 0:
+        elements_dict = []
+        data_el = []
+        for i in range(len(buf)):
+            data_el.append(buf[i].split(':'))
+            for j in range(len(data)):
+                if data[j].name == data_el[i][0]:
+                    elements_dict.append({'el':{'name':data_el[i][0],'spectrum': data[j].spectrum.split(',')}, 'body': data_el[i][1]})
+            
+            
+        for i in range(len(elements_dict)):
+            for j in range(len(elements_dict[i]['el']['spectrum'])):
+                elements_dict[i]['el']['spectrum'][j] = float(elements_dict[i]['el']['spectrum'][j]) 
+        
 
+           
+        plt.figure(label)
+        plt.clf()
+        plt.title(label)
+        plt.xlabel('wavelength')
+        plt.ylabel('intensity')
+        
+        for i in range(len(elements_dict)):
+            plt.plot([1,2,3,4,5], elements_dict[i]['el']['spectrum'], label = elements_dict[i]['el']['name'])
+        
+        plt.plot(simple, Vhid, label = label)
+        plt.legend()
+        plt.savefig(filename)
+        
+        
+        return render_template('res2.html', 
+                                   title = 'result',
+                                   outputs = outputs,
+                                   spectra = spectra,
+                                   data = data,
+                                   filename = filename,
+                                   elements_dict = elements_dict
+                                   )
 
+    else:
+        plt.figure(outputs[0]['el']['name'])
+        plt.clf()
+        plt.title(outputs[0]['el']['name'])
+        plt.xlabel('wavelength')
+        plt.ylabel('intensity')
+        plt.plot(simple, Vhid)
+        plt.savefig(filename)
+
+        return render_template('res2.html', 
+                                   title = 'result',
+                                   outputs = outputs,
+                                   spectra = spectra,
+                                   data = data,
+                                   filename = filename,
+                                   )
+        
+        
 
 @app.route('/DataBase', methods = ['GET', 'POST'])
 def DataBase():
+    data = Spec.query.all()
+        
+    
     if request.method == "GET":
         data = Spec.query.all()
         return render_template('DataBase.html', 
@@ -221,19 +263,29 @@ def DataBase():
         
     elif request.method == "POST":        
         if request.form["id"]:
+            buf = int(request.form["id"])
             Spec.query.filter(Spec.id == request.form["id"]).delete()
+            for i in range(len(data)):
+                if int(data[i].id) > buf:
+                    data[i].id = str(int(data[i].id)-1)
+                
             db.session.commit()
             data = Spec.query.all()
             return render_template('DataBase.html', 
                               title = 'Database',
                               data = data
                               )
+    return render_template('DataBase.html', 
+                              title = 'Database',
+                              data = data,
+                              flag = True)
         
         
             
             
 @app.route('/add', methods = ['GET', 'POST'])
 def addspectrum():
+        data = Spec.query.all()
         form = MyForm3(request.form)
         if request.method == "POST":
              prov = form.spectr.data.split(',')
@@ -266,7 +318,7 @@ def addspectrum():
         else:
             return render_template('add.html', 
                                    title = 'Add the spectrum',
-                                   form = form,
+                                   form = form
                                    )
             
 
@@ -274,16 +326,16 @@ def addspectrum():
 
 @app.route('/Graphics', methods = ['GET', 'POST'])
 def Graphics():
+    data = Spec.query.all()
+    
     if request.method == "GET":
-        data = Spec.query.all()
         return render_template('Graphics.html', 
                                title = 'Graphics',
                                data = data
                                )
         
         
-    elif request.method == "POST": 
-        data = Spec.query.all()
+    elif request.method == "POST":
         flag = False
         for i in range(len(data)):
             if str(i+1) == request.form["id"]:
@@ -294,8 +346,9 @@ def Graphics():
                 except AttributeError:
                     flag = True
                     
-        simple = [1,2,3]            
+        simple = []            
         for i in range(len(Vhid)):
+            simple.append(i+1)
             Vhid[i] = float(Vhid[i]) 
             
         if flag == False:        
@@ -311,8 +364,7 @@ def Graphics():
             for i in range(len(elements_dict)):
                 for j in range(len(elements_dict[i]['el']['spectrum'])):
                     elements_dict[i]['el']['spectrum'][j] = float(elements_dict[i]['el']['spectrum'][j]) 
-            
-            simple = [1,2,3]            
+                      
             plt.figure(label)
             plt.clf()
             plt.title(label)
@@ -320,8 +372,7 @@ def Graphics():
             plt.ylabel('intensity')
             
             for i in range(len(elements_dict)):
-                plt.plot(simple, elements_dict[i]['el']['spectrum'], label = elements_dict[i]['el']['name'])
-                plt.text(2.25, 4.5-i/2,elements_dict[i]['el']['name'] + ' Proportion: ' + elements_dict[i]['body'])
+                plt.plot([1,2,3,4,5], elements_dict[i]['el']['spectrum'], label = elements_dict[i]['el']['name']+ ' Proportion: ' + elements_dict[i]['body'])
             plt.plot(simple, Vhid, label = label)
             plt.legend()
             plt.savefig(filename)         
@@ -336,16 +387,19 @@ def Graphics():
             plt.ylabel('intensity')
             
             
-            plt.plot(simple, Vhid, label = 'label')
+            plt.plot(simple, Vhid)
             plt.legend()
             plt.savefig(filename)
             return send_file(filename, mimetype='image/png')
 
+    return render_template('Graphics.html', 
+                               title = 'Graphics',
+                               data = data,
+                               flag = True)
 
 
 
-
-@app.route("/home/alex/Документы/Recognition_of_substances/app/static/fonts/grafic.png")
+@app.route("/home/alex/Документы/Recognition_of_substances/app/static/fonts/graphic.png")
 def show_icon():
      return send_file(filename, mimetype='image/png')
     

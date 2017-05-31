@@ -4,7 +4,7 @@
 {% block content %}
 <div class="splash">
   <div class="container">
-<h1>Determinetion of the composition</h1>
+<h1>Determination of the composition</h1>
 <br></br>
 <br></br>
 <form action="" method="post" name="spectr">
@@ -21,6 +21,23 @@
     </p>
     <p><input class="btn btn-default" type="submit" value="Determine the composition"></p>
 </form>
+<br></br>
+
+<form action="" method="post" name="substance">
+    {{form2.hidden_tag()}}
+    <p>
+        Or choose the substance:<br>
+        <p><select name="substance">
+        {% for name in data %}
+        <option>{{name.name}}</option>
+         {% endfor %}<br></select></p>  
+        {% for error in form.errors.substance %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}<br>
+    </p>
+    <p><input class="btn btn-default" type="submit" value="Determine the composition"></p>
+</form>
+
 <br></br>
 <form> 
    <p><button class="btn btn-default" formaction="Info1"> Back to information </button></p>

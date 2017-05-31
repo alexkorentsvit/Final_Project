@@ -10,12 +10,12 @@
 <div class="article-content">
 <h1>Updated database</h1>
 <table class="table table-bordered">
- <tr><th>Name</th><th>Spectrum</th>
+ <tr><td align="center">№</td><td align="center">Name</td>
 
 {% for d in data%}
 <tr style="background-color: #f5f5f5;">
-<td>{{d.name}}</td>
-<td>{{d.spectrum}}</td>
+<td align="center">{{d.id}}</td>
+<td align="center">{{d.name}}</td>
 </tr>
 {%endfor%}  
 
@@ -29,7 +29,7 @@
 </form> 
 
 <form> 
-   <p><button class="btn btn-default" formaction="Determinetion"> Back to the Determinetion of the composition </button></p>
+   <p><button class="btn btn-default" formaction="Determination"> Back to the Determination of the composition </button></p>
 </form> 
 </div>
 </div>
