@@ -1,3 +1,7 @@
 Example for an element in the database: 4.0,5.0,5.0    or  2.0,1.0,2.0
 Example for an element not in the database: 2.2,2.2,2.5  or  3.2,3.4,3.8
 An example for a substance that can not be identified: 3.6,3.8,4.2
+
+0.148,0.235,0.105,0.01,0.195,0.055,0.18 Carbon Dioxide
+
+3.2,3.4,3.8,2.86,2.7  Water
